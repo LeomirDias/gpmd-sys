@@ -47,10 +47,11 @@ export const EventsSection = ({ events }: EventsSectionProps) => {
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead>ID do Evento</TableHead>
               <TableHead>Tipo</TableHead>
               <TableHead>Categoria</TableHead>
               <TableHead>Destinatário</TableHead>
-              <TableHead>Assunto</TableHead>
+              <TableHead>Produto</TableHead>
               <TableHead>Data de Criação</TableHead>
               <TableHead>Data de Envio</TableHead>
               <TableHead className="w-[100px]">Ações</TableHead>

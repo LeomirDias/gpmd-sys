@@ -1,13 +1,14 @@
 "use client";
 
 import { Eye } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import {
   TableCell,
   TableRow,
 } from "@/components/ui/table";
+import { getProductNameById } from "@/actions/product/get-product-name";
 
 import { EventDetailDialog } from "./event-detail-dialog";
 
@@ -28,6 +29,17 @@ interface EventRowProps {
 
 export const EventRow = ({ event }: EventRowProps) => {
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
+  const [productName, setProductName] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!event.product_id) {
+      setProductName(null);
+      return;
+    }
+    getProductNameById(event.product_id).then((p) =>
+      setProductName(p?.name ?? null)
+    );
+  }, [event.product_id]);
 
   const getCategoryLabel = (category: string) => {
     switch (category) {
@@ -58,10 +70,15 @@ export const EventRow = ({ event }: EventRowProps) => {
   return (
     <>
       <TableRow>
+        <TableCell>{event.id}</TableCell>
         <TableCell>{getTypeLabel(event.type)}</TableCell>
         <TableCell>{getCategoryLabel(event.category)}</TableCell>
         <TableCell>{event.to}</TableCell>
-        <TableCell className="max-w-xs truncate">{event.subject}</TableCell>
+        <TableCell className="max-w-xs truncate">
+          {!event.product_id
+            ? "Não associado a nenhum produto"
+            : productName ?? event.product_id}
+        </TableCell>
         <TableCell>
           {event.created_at
             ? new Date(event.created_at).toLocaleDateString("pt-BR", {

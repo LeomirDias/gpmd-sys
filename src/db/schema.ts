@@ -123,7 +123,7 @@ export const ordersTable = pgTable("orders", {
   status: text("status").notNull().default("pending"),
   products: jsonb("products").notNull().default([]),
   lead_id: uuid("lead_id").references(() => leads.id, {
-    onDelete: "set null",
+    onDelete: "cascade",
   }),
   created_at: timestamp("created_at", { withTimezone: true })
     .notNull()
@@ -139,6 +139,9 @@ export const events = pgTable("events", {
   subject: text("subject").notNull(),
   product_id: uuid("product_id").references(() => products.id, {
     onDelete: "set null",
+  }),
+  lead_id: uuid("lead_id").references(() => leads.id, {
+    onDelete: "cascade",
   }),
   sent_at: timestamp("sent_at", { withTimezone: true }),
   created_at: timestamp("created_at", { withTimezone: true })

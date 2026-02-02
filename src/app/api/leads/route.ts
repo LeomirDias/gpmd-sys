@@ -1,6 +1,7 @@
 import { eq, or } from "drizzle-orm";
 
 type OrderProduct = { product_id: string; quantity: number };
+import { after } from "next/server";
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import { z } from "zod";
@@ -90,6 +91,9 @@ const updateLeadSchema = z
     message: "Informe email ou phone para identificar o lead",
     path: ["email"],
   });
+
+/** Tempo máximo para a função (inclui trabalho em background via after) */
+export const maxDuration = 60;
 
 export async function POST(req: NextRequest) {
   try {
@@ -201,132 +205,129 @@ export async function POST(req: NextRequest) {
       })
       .returning();
 
-    // 3) Buscar produtos pelo pedido (todos que foram enviados)
     const orderProductIds = (newOrder.products as OrderProduct[]).map(
       (p) => p.product_id,
     );
-    const dbProducts = await getProductsByIds(orderProductIds);
-
-    // 4) Baixar arquivos do Vercel Blob (um por produto)
-    const productBuffers: {
-      product: (typeof dbProducts)[0];
-      buffer: Buffer;
-    }[] = [];
-    for (const product of dbProducts) {
-      try {
-        const blobUrl =
-          product.provider_path.startsWith("http") ||
-          product.provider_path.startsWith("https")
-            ? product.provider_path
-            : `https://${product.provider_path}`;
-        const arrayBuffer = await fetchBlobWithRetry(blobUrl);
-        const buffer = Buffer.from(arrayBuffer);
-        productBuffers.push({ product, buffer });
-      } catch (err) {
-        console.error(
-          "[API][Leads] Erro ao baixar arquivo do produto:",
-          product.id,
-          err,
-        );
-        return withCorsHeaders(
-          NextResponse.json(
-            {
-              error: "Erro ao baixar arquivo do produto",
-              detail: err instanceof Error ? err.message : "Erro desconhecido",
-              product_id: product.id,
-            },
-            { status: 500 },
-          ),
-          req,
-        );
-      }
-    }
-
-    // 5) Enviar arquivos (email com todos os anexos; WhatsApp um doc por produto)
-    let deliverySent: "email" | "phone" | "both" | null = null;
-    const deliveryErrors: { channel: "email" | "whatsapp"; error: string }[] =
-      [];
+    const orderId = newOrder.id;
     const customerName = validatedData.name;
 
-    if (productBuffers.length > 0) {
-      const sendTasks: Array<{
-        channel: "email" | "whatsapp";
-        fn: () => Promise<void>;
-      }> = [];
+    // Responde 201 imediatamente para evitar timeout; entrega roda em background
+    after(async () => {
+      try {
+        const dbProductsRaw = await getProductsByIds(orderProductIds);
+        const dbProducts = orderProductIds
+          .map((id) => dbProductsRaw.find((p) => p.id === id))
+          .filter((p): p is NonNullable<typeof p> => p != null);
 
-      if (contactType === "email" || contactType === "both") {
-        if (email) {
-          sendTasks.push({
-            channel: "email",
-            fn: async () => {
-              const attachments = [
-                getEmailLogoAttachment(),
-                ...productBuffers.map(({ product, buffer }) => {
-                  const rawFileName =
-                    product.provider_path.split("/").pop() ||
-                    `${product.name}.pdf`;
-                  const fileName = (() => {
-                    try {
-                      return decodeURIComponent(rawFileName);
-                    } catch {
-                      return rawFileName;
-                    }
-                  })();
-                  return {
-                    filename: fileName,
-                    content: buffer.toString("base64"),
-                  };
-                }),
-              ];
-              const productNames = dbProducts.map((p) => p.name).join(", ");
-              await resend.emails.send({
-                from: `${process.env.NAME_FOR_ACCOUNT_MANAGEMENT_SUBMISSIONE} <${process.env.EMAIL_FOR_ACCOUNT_MANAGEMENT_SUBMISSION}>`,
-                to: email,
-                subject: `Seus produtos estão prontos!`,
-                react: ProductDeliveryEmail({
-                  customerName,
-                  productName:
-                    dbProducts.length === 1
-                      ? dbProducts[0]!.name
-                      : productNames,
-                }),
-                attachments,
-              });
-              for (const { product } of productBuffers) {
-                await db.insert(events).values({
-                  type: "email_delivery",
-                  category: "lead_capture",
-                  to: email,
-                  subject: `Produto ${product.name} entregue por email.`,
-                  product_id: product.id,
-                  sent_at: new Date(),
-                });
-              }
-            },
-          });
+        if (dbProducts.length === 0) {
+          console.error(
+            "[API][Leads] Nenhum produto encontrado para entrega:",
+            orderProductIds,
+          );
+          return;
         }
-      }
 
-      if (contactType === "phone" || contactType === "both") {
-        if (phone) {
-          for (const { product, buffer } of productBuffers) {
-            const rawFileName =
-              product.provider_path.split("/").pop() || `${product.name}.pdf`;
-            const fileName = (() => {
-              try {
-                return decodeURIComponent(rawFileName);
-              } catch {
-                return rawFileName;
-              }
-            })();
+        const productBuffers: {
+          product: (typeof dbProducts)[0];
+          buffer: Buffer;
+        }[] = [];
+        for (const product of dbProducts) {
+          try {
+            const blobUrl =
+              product.provider_path.startsWith("http") ||
+              product.provider_path.startsWith("https")
+                ? product.provider_path
+                : `https://${product.provider_path}`;
+            const arrayBuffer = await fetchBlobWithRetry(blobUrl);
+            productBuffers.push({ product, buffer: Buffer.from(arrayBuffer) });
+          } catch (err) {
+            console.error(
+              "[API][Leads] Erro ao baixar arquivo do produto:",
+              product.id,
+              err,
+            );
+            return;
+          }
+        }
+
+        const sendTasks: Array<{
+          channel: "email" | "whatsapp";
+          fn: () => Promise<void>;
+        }> = [];
+
+        if (contactType === "email" || contactType === "both") {
+          if (email) {
             sendTasks.push({
-              channel: "whatsapp",
+              channel: "email",
               fn: async () => {
-                await sendWhatsappDocument(
-                  phone,
-                  buffer,
-                  fileName,
-                  ` Olá ${customerName}! 👋  
+                const attachments = [
+                  getEmailLogoAttachment(),
+                  ...productBuffers.map(({ product, buffer }) => {
+                    const rawFileName =
+                      product.provider_path.split("/").pop() ||
+                      `${product.name}.pdf`;
+                    const fileName = (() => {
+                      try {
+                        return decodeURIComponent(rawFileName);
+                      } catch {
+                        return rawFileName;
+                      }
+                    })();
+                    return {
+                      filename: fileName,
+                      content: buffer.toString("base64"),
+                    };
+                  }),
+                ];
+                const productNames = dbProducts.map((p) => p.name).join(", ");
+                await resend.emails.send({
+                  from: `${process.env.NAME_FOR_ACCOUNT_MANAGEMENT_SUBMISSIONE} <${process.env.EMAIL_FOR_ACCOUNT_MANAGEMENT_SUBMISSION}>`,
+                  to: email,
+                  subject: `Seus produtos estão prontos!`,
+                  react: ProductDeliveryEmail({
+                    customerName,
+                    productName:
+                      dbProducts.length === 1
+                        ? dbProducts[0]!.name
+                        : productNames,
+                  }),
+                  attachments,
+                });
+                for (const { product } of productBuffers) {
+                  await db.insert(events).values({
+                    type: "email_delivery",
+                    category: "lead_capture",
+                    to: email,
+                    subject: `Produto ${product.name} entregue por email.`,
+                    product_id: product.id,
+                    sent_at: new Date(),
+                  });
+                }
+              },
+            });
+          }
+        }
+
+        if (contactType === "phone" || contactType === "both") {
+          if (phone) {
+            for (const { product, buffer } of productBuffers) {
+              const rawFileName =
+                product.provider_path.split("/").pop() || `${product.name}.pdf`;
+              const fileName = (() => {
+                try {
+                  return decodeURIComponent(rawFileName);
+                } catch {
+                  return rawFileName;
+                }
+              })();
+              sendTasks.push({
+                channel: "whatsapp",
+                fn: async () => {
+                  await sendWhatsappDocument(
+                    phone,
+                    buffer,
+                    fileName,
+                    ` Olá ${customerName}! 👋  
                 
 Seu ${product.name} está pronto!  🎉
                 
@@ -344,59 +345,52 @@ Equipe CarsLab 💛
 
 📧 Fale conosco via Email: suportecarslab@gmail.com
                 `,
-                );
-                await db.insert(events).values({
-                  type: "whatsapp_delivery",
-                  category: "lead_capture",
-                  to: phone,
-                  subject: `Produto ${product.name} entregue via WhatsApp`,
-                  product_id: product.id,
-                  sent_at: new Date(),
-                });
-              },
-            });
+                  );
+                  await db.insert(events).values({
+                    type: "whatsapp_delivery",
+                    category: "lead_capture",
+                    to: phone,
+                    subject: `Produto ${product.name} entregue via WhatsApp`,
+                    product_id: product.id,
+                    sent_at: new Date(),
+                  });
+                },
+              });
+            }
           }
         }
-      }
 
-      if (sendTasks.length > 0) {
-        const results = await Promise.allSettled(
-          sendTasks.map((task) => task.fn()),
-        );
-        results.forEach((result, i) => {
-          if (result.status === "rejected") {
-            const channel = sendTasks[i]!.channel;
-            const msg =
-              result.reason?.message ??
-              String(result.reason ?? "Erro desconhecido");
-            console.error(
-              `[API][Leads] Erro ao enviar por ${channel}:`,
-              result.reason,
-            );
-            deliveryErrors.push({ channel, error: msg });
+        if (sendTasks.length > 0) {
+          const results = await Promise.allSettled(
+            sendTasks.map((task) => task.fn()),
+          );
+          results.forEach((result, i) => {
+            if (result.status === "rejected") {
+              console.error(
+                `[API][Leads] Erro ao enviar por ${sendTasks[i]!.channel}:`,
+                result.reason,
+              );
+            }
+          });
+          const allSettled = results.every((r) => r.status === "fulfilled");
+          if (allSettled && orderId) {
+            await db
+              .update(ordersTable)
+              .set({ status: "delivered" })
+              .where(eq(ordersTable.id, orderId));
           }
-        });
-        if (deliveryErrors.length < sendTasks.length) {
-          deliverySent = contactType;
         }
-
-        // 6) Se envio for ok, atualizar status do order para delivered
-        if (deliveryErrors.length === 0 && newOrder.id) {
-          await db
-            .update(ordersTable)
-            .set({ status: "delivered" })
-            .where(eq(ordersTable.id, newOrder.id));
-        }
+      } catch (err) {
+        console.error("[API][Leads] Erro na entrega em background:", err);
       }
-    }
+    });
 
     return withCorsHeaders(
       NextResponse.json(
         {
           success: true,
           data: newLead,
-          ...(deliverySent && { delivery_sent: deliverySent }),
-          ...(deliveryErrors.length > 0 && { delivery_errors: deliveryErrors }),
+          delivery_status: "processing",
         },
         { status: 201 },
       ),

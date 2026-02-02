@@ -23,7 +23,7 @@ const ProductDeliveryEmail = (props: ProductDeliveryEmailProps) => {
   return (
     <Html lang="pt-BR">
       <Head>
-        <title>Seu {productName} está pronto!</title>
+        <title>{`Seu ${productName} está pronto!`}</title>
       </Head>
       <Preview>
         Olá {customerName}! Seu {productName} está pronto para download.

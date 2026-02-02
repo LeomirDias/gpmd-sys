@@ -51,7 +51,7 @@ const ProductDeliveryEmail = (props: ProductDeliveryEmailProps) => {
             {/* Header */}
             <Section
               style={{
-                backgroundColor: "#16a34a",
+                backgroundColor: "#333333",
                 borderRadius: "8px 8px 0 0",
                 padding: "32px 24px 24px",
                 textAlign: "center",

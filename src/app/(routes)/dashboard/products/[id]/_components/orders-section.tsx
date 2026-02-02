@@ -38,10 +38,12 @@ export const OrdersSection = ({ orders }: OrdersSectionProps) => {
           <TableHeader>
             <TableRow>
               <TableHead>ID do Pedido</TableHead>
-              <TableHead>Data</TableHead>
+              <TableHead>Lead</TableHead>
+              <TableHead>Produto</TableHead>
               <TableHead>Tipo</TableHead>
               <TableHead>Valor Total</TableHead>
               <TableHead>Status</TableHead>
+              <TableHead>Data</TableHead>
               <TableHead className="w-[100px]">Ações</TableHead>
             </TableRow>
           </TableHeader>

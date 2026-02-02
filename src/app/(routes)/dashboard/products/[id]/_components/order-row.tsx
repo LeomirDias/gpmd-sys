@@ -1,12 +1,13 @@
 "use client";
 
 import { Eye } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { TableCell, TableRow } from "@/components/ui/table";
-
+import { getOrderRelatedData } from "@/actions/order/get-order-related-data";
 import type { OrderByProductId } from "@/data/orders/get-orders-by-product-id";
+
 import { OrderDetailDialog } from "./order-detail-dialog";
 
 
@@ -16,6 +17,22 @@ interface OrderRowProps {
 
 export const OrderRow = ({ order }: OrderRowProps) => {
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
+  const [leadEmail, setLeadEmail] = useState<string | null>(null);
+  const [productNames, setProductNames] = useState<Map<string, string>>(new Map());
+
+  useEffect(() => {
+    const productIds = (order.products ?? []).map((p) => p.product_id);
+    getOrderRelatedData(order.lead_id ?? null, productIds).then(
+      ({ lead, products: prods }) => {
+        setLeadEmail(lead?.email ?? null);
+        setProductNames(new Map(prods.map((p) => [p.id, p.name])));
+      }
+    );
+  }, [order.id]);
+
+  const productNamesList = (order.products ?? [])
+    .map((p) => productNames.get(p.product_id) ?? p.product_id)
+    .join(", ");
 
   const getOrderTypeLabel = (type: string) => {
     switch (type) {
@@ -65,6 +82,19 @@ export const OrderRow = ({ order }: OrderRowProps) => {
     <>
       <TableRow>
         <TableCell className="font-mono text-xs">{order.order_id}</TableCell>
+        <TableCell className="max-w-xs truncate">
+          {!order.lead_id
+            ? "Não associado a nenhum lead"
+            : leadEmail ?? order.lead_id}
+        </TableCell>
+        <TableCell className="max-w-xs truncate">
+          {order.products?.length
+            ? productNamesList
+            : "—"}
+        </TableCell>
+        <TableCell>{getTypeLabel(order.order_type)}</TableCell>
+        <TableCell>{formatAmount(order.total_amount)}</TableCell>
+        <TableCell>{getStatusLabel(order.status)}</TableCell>
         <TableCell>
           {new Date(order.order_date).toLocaleDateString("pt-BR", {
             day: "2-digit",
@@ -74,9 +104,6 @@ export const OrderRow = ({ order }: OrderRowProps) => {
             minute: "2-digit",
           })}
         </TableCell>
-        <TableCell>{getTypeLabel(order.order_type)}</TableCell>
-        <TableCell>{formatAmount(order.total_amount)}</TableCell>
-        <TableCell>{getStatusLabel(order.status)}</TableCell>
         <TableCell>
           <Button
             variant="ghost"

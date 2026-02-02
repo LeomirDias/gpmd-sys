@@ -159,12 +159,12 @@ export async function POST(req: NextRequest) {
       const [newLead] = await db
         .insert(leads)
         .values({
-          landing_source: "checkout",
+          landing_source: "Checkout Cakto",
           name: customerName,
           email: customerEmail,
           phone: customerPhone,
           contact_type: contactType,
-          user_type: "direct-customer",
+          user_type: "hobby",
           consent_marketing: true,
           conversion_status: "converted",
           remarketing_status: "not_sent_remarketing",

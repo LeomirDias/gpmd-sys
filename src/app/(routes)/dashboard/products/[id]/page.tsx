@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 
 import {
   PageContainer,
@@ -13,6 +13,8 @@ import { getProductById } from "@/data/products/get-products";
 
 import { EventsSection } from "./_components/events-section";
 import { LeadsSection } from "./_components/leads-section";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 
 // Força renderização no servidor a cada requisição (evita cache vazio em produção)
 export const dynamic = "force-dynamic";
@@ -24,6 +26,13 @@ interface ProductDetailPageProps {
 export default async function ProductDetailPage({
   params,
 }: ProductDetailPageProps) {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+  if (!session?.user) {
+    redirect("/");
+  }
+
   const { id } = await params;
   const product = await getProductById(id);
 

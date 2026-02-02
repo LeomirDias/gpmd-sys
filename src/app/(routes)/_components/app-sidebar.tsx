@@ -37,25 +37,6 @@ export function AppSidebar() {
 
   const pathname = usePathname();
 
-  const [hasUnreadPending, setHasUnreadPending] = useState<boolean>(false);
-  useEffect(() => {
-    let mounted = true;
-    const fetchPending = async () => {
-      try {
-        const res = await fetch("/api/appointments/pending-count", { cache: "no-store" });
-        const data = (await res.json()) as { notConfirmed: number; toConclude: number };
-        if (!mounted) return;
-        setHasUnreadPending((data?.notConfirmed || 0) > 0 || (data?.toConclude || 0) > 0);
-      } catch { }
-    };
-    fetchPending();
-    const id = setInterval(fetchPending, 30000);
-    return () => {
-      mounted = false;
-      clearInterval(id);
-    };
-  }, [pathname]);
-
   return (
     <Sidebar
       variant="floating"
@@ -76,9 +57,6 @@ export function AppSidebar() {
                     <Link href={item.url}>
                       <div className="relative">
                         <item.icon className="h-5 w-5" />
-                        {item.url === "/appointments/pending" && hasUnreadPending && (
-                          <span className="absolute -right-0.5 -top-0.5 inline-flex h-2.5 w-2.5 items-center justify-center rounded-full bg-emerald-500" aria-hidden />
-                        )}
                       </div>
                       <span className="text-sm">{item.title}</span>
                     </Link>

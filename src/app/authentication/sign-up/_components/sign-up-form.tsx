@@ -174,7 +174,7 @@ const SignUpForm = () => {
                   "Criar conta"
                 )}
               </Button>
-              <p className="text-center text-sm font-normal text-foreground/50">Já tem uma conta? <Link href="/authentication" className="text-primary/80 hover:text-primary/90">Entrar</Link></p>
+              <p className="text-center text-sm font-normal text-foreground/50">Já tem uma conta? <Link href="/" className="text-primary/80 hover:text-primary/90">Entrar</Link></p>
             </div>
           </CardFooter>
         </form>

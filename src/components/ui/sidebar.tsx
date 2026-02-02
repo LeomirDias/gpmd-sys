@@ -353,10 +353,7 @@ function SidebarHeader({ className, ...props }: React.ComponentProps<"div">) {
     >
       <div className="flex w-full items-center justify-center">
         <div className="flex items-center justify-center">
-          <Image src="/LogoiGenda.png" alt="iGenda" width={30} height={30} />
-          <h1 className="ml-0.5 text-xl font-bold text-green-500 group-data-[state=collapsed]:hidden">
-            iGenda
-          </h1>
+          <Image src="/logo-gpmd.png" alt="GMPD" width={120} height={120} />
         </div>
       </div>
     </div>

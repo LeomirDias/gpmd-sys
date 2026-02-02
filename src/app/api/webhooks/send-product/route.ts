@@ -81,7 +81,8 @@ export async function POST(req: NextRequest) {
     const customerPhone = customer.phone?.trim() || null;
     const customerName = customer.name?.trim() || "Cliente";
     const rawAmount = data?.amount;
-    const totalAmount = Math.round(
+    // Valor chega em centavos (inteiro); salvar em centavos sem arredondar (truncar se vier decimal).
+    const totalAmount = Math.trunc(
       typeof rawAmount === "number"
         ? rawAmount
         : typeof rawAmount === "string"

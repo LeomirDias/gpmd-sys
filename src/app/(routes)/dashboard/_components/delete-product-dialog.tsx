@@ -59,13 +59,13 @@ export const DeleteProductDialog = ({
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={status === "executing"}>
+          <AlertDialogCancel disabled={status === "executing"} className="border bg-background shadow-xs hover:bg-accent hover:shadow-xl hover:scale-105 transition-all duration-300">
             Cancelar
           </AlertDialogCancel>
           <AlertDialogAction
             onClick={handleDelete}
             disabled={status === "executing"}
-            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            className="bg-red-800 text-white hover:shadow-xl hover:scale-105 transition-all duration-300"
           >
             {status === "executing" ? "Excluindo..." : "Excluir"}
           </AlertDialogAction>

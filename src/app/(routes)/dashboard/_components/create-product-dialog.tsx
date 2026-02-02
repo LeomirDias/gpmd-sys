@@ -21,8 +21,8 @@ export const CreateProductDialog = () => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button>
-          <Plus className="mr-2 h-4 w-4" />
+        <Button variant="default">
+          <Plus className="h-4 w-4" />
           Adicionar Produto
         </Button>
       </DialogTrigger>

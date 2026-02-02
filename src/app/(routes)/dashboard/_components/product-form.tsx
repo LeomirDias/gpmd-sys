@@ -210,7 +210,7 @@ export const ProductForm = ({ defaultValues, onSuccess }: ProductFormProps) => {
         />
 
         <div className="flex justify-end gap-2">
-          <Button type="submit" disabled={isLoading}>
+          <Button type="submit" disabled={isLoading} variant="default">
             {isLoading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />

@@ -173,6 +173,16 @@ export async function POST(req: NextRequest) {
       lead = newLead!;
     }
 
+    if (!lead?.id) {
+      console.error("[CAKTO][Webhook] Lead sem id após criar/atualizar:", lead);
+      return NextResponse.json(
+        { error: "Erro ao obter id do lead" },
+        { status: 500 },
+      );
+    }
+
+    const leadId = lead.id;
+
     // 2) Criar order com todos os produtos enviados
     const orderProducts: OrderProduct[] = productIds.map((id) => ({
       product_id: id,
@@ -182,7 +192,7 @@ export async function POST(req: NextRequest) {
       .insert(ordersTable)
       .values({
         order_id: crypto.randomUUID(),
-        lead_id: lead.id,
+        lead_id: leadId,
         order_date: new Date(),
         order_type: "sale",
         total_amount: totalAmount,
@@ -343,7 +353,7 @@ Equipe CarsLab 💛
                     subject: `Produto ${product.name} entregue via WhatsApp`,
                     product_id: product.id,
                     sent_at: new Date(),
-                    lead_id: lead.id,
+                    lead_id: leadId,
                   });
                 },
               });
@@ -381,7 +391,7 @@ Equipe CarsLab 💛
 
     return NextResponse.json({
       ok: true,
-      leadId: lead.id,
+      leadId,
       orderId: newOrder?.id,
       productIds,
       message: "Pedido criado. Entrega em processamento.",

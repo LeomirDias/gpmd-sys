@@ -187,6 +187,19 @@ export async function POST(req: NextRequest) {
       })
       .returning();
 
+    if (!newLead?.id) {
+      console.error("[API][Leads] Insert do lead não retornou id:", newLead);
+      return withCorsHeaders(
+        NextResponse.json(
+          { error: "Erro ao criar lead: id não retornado pelo banco" },
+          { status: 500 },
+        ),
+        req,
+      );
+    }
+
+    const leadId = newLead.id;
+
     // 2) Criar order com todos os produtos enviados
     const orderProducts: OrderProduct[] = productIds.map((id) => ({
       product_id: id,
@@ -196,7 +209,7 @@ export async function POST(req: NextRequest) {
       .insert(ordersTable)
       .values({
         order_id: crypto.randomUUID(),
-        lead_id: newLead.id,
+        lead_id: leadId,
         order_date: new Date(),
         order_type: "lead_capture",
         total_amount: 0,
@@ -354,7 +367,7 @@ Equipe CarsLab 💛
                     subject: `Produto ${product.name} entregue via WhatsApp`,
                     product_id: product.id,
                     sent_at: new Date(),
-                    lead_id: newLead.id,
+                    lead_id: leadId,
                   });
                 },
               });

@@ -42,19 +42,19 @@ export const ProductCard = ({ product }: ProductCardProps) => {
     <>
       <Card>
         <CardHeader>
-          <CardTitle>{product.name}</CardTitle>
+          <CardTitle>{product.name} </CardTitle>
           <CardDescription>
-            {product.type} - Versão {product.version}
+            {product.type.charAt(0).toUpperCase() + product.type.slice(1)} - Versão {product.version}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-2 text-sm text-muted-foreground">
             <p>
-              <span className="font-medium">Criado em:</span>{" "}
+              <span className="font-medium text-primary">Criado em:</span>{" "}
               {dayjs(product.created_at).format("DD/MM/YYYY [às] HH:mm")}
             </p>
             <p>
-              <span className="font-medium">ID Externo:</span>{" "}
+              <span className="font-medium text-primary">ID Externo:</span>{" "}
               {product.external_id}
             </p>
           </div>
@@ -62,8 +62,8 @@ export const ProductCard = ({ product }: ProductCardProps) => {
         <CardFooter className="flex gap-2">
           <Button variant="outline" size="sm" asChild>
             <Link href={`/dashboard/products/${product.id}`}>
-              <Eye className="mr-2 h-4 w-4" />
-              Ver Produto
+              <Eye className="h-4 w-4" />
+              Acessar
             </Link>
           </Button>
           <Button
@@ -71,7 +71,7 @@ export const ProductCard = ({ product }: ProductCardProps) => {
             size="sm"
             onClick={() => setEditDialogOpen(true)}
           >
-            <Pencil className="mr-2 h-4 w-4" />
+            <Pencil className="h-4 w-4" />
             Editar
           </Button>
           <Button
@@ -79,7 +79,7 @@ export const ProductCard = ({ product }: ProductCardProps) => {
             size="sm"
             onClick={() => setDeleteDialogOpen(true)}
           >
-            <Trash2 className="mr-2 h-4 w-4" />
+            <Trash2 className="h-4 w-4" />
             Excluir
           </Button>
         </CardFooter>

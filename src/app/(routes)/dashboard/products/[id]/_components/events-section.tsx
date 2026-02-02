@@ -19,6 +19,7 @@ interface EventsSectionProps {
     created_at: Date;
     updated_at: Date;
     product_id: string | null;
+    lead_id: string | null;
   }>;
 }
 
@@ -45,8 +46,9 @@ export const EventsSection = ({ events }: EventsSectionProps) => {
             <TableRow>
               <TableHead>Tipo</TableHead>
               <TableHead>Categoria</TableHead>
-              <TableHead>Para</TableHead>
+              <TableHead>Destinatário</TableHead>
               <TableHead>Assunto</TableHead>
+              <TableHead>Data de Criação</TableHead>
               <TableHead>Data de Envio</TableHead>
               <TableHead className="w-[100px]">Ações</TableHead>
             </TableRow>

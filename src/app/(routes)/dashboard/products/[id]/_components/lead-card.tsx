@@ -23,6 +23,7 @@ interface LeadCardProps {
     phone: string | null;
     contact_type: string;
     conversion_status: string;
+    remarketing_status: string;
     landing_source: string;
     user_type: string;
     consent_marketing: boolean;
@@ -39,7 +40,7 @@ export const LeadCard = ({ lead }: LeadCardProps) => {
       case "converted":
         return "text-green-600";
       case "not_converted":
-        return "text-yellow-600";
+        return "text-red-600";
       default:
         return "text-gray-600";
     }

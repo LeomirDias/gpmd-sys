@@ -22,6 +22,7 @@ interface LeadDetailDialogProps {
     phone: string | null;
     contact_type: string;
     conversion_status: string;
+    remarketing_status: string;
     landing_source: string;
     user_type: string;
     consent_marketing: boolean;
@@ -37,12 +38,23 @@ export const LeadDetailDialog = ({
   open,
   onOpenChange,
 }: LeadDetailDialogProps) => {
-  const getStatusLabel = (status: string) => {
+  const getConversionStatusLabel = (status: string) => {
     switch (status) {
       case "converted":
         return "Convertido";
       case "not_converted":
         return "Não Convertido";
+      default:
+        return status;
+    }
+  };
+
+  const getRemarketingStatusLabel = (status: string) => {
+    switch (status) {
+      case "sent_remarketing":
+        return "Enviado";
+      case "not_sent_remarketing":
+        return "Não Enviado";
       default:
         return status;
     }
@@ -117,7 +129,17 @@ export const LeadDetailDialog = ({
               <p className="text-muted-foreground text-sm font-medium">
                 Status de Conversão
               </p>
-              <p className="mt-1">{getStatusLabel(lead.conversion_status)}</p>
+              <p className="mt-1">
+                {getConversionStatusLabel(lead.conversion_status)}
+              </p>
+            </div>
+            <div>
+              <p className="text-muted-foreground text-sm font-medium">
+                Status Remarketing
+              </p>
+              <p className="mt-1">
+                {getRemarketingStatusLabel(lead.remarketing_status)}
+              </p>
             </div>
             <div>
               <p className="text-muted-foreground text-sm font-medium">

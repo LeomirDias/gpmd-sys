@@ -8,6 +8,7 @@ interface LeadsSectionProps {
     phone: string | null;
     contact_type: string;
     conversion_status: string;
+    remarketing_status: string;
     landing_source: string;
     user_type: string;
     consent_marketing: boolean;

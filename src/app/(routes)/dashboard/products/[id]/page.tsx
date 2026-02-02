@@ -9,10 +9,12 @@ import {
 } from "@/components/ui/page-container";
 import { getEventsByProductId } from "@/data/events/get-events-by-product-id";
 import { getLeadsByProductId } from "@/data/leads/get-leads-by-product-id";
+import { getOrdersByProductId } from "@/data/orders/get-orders-by-product-id";
 import { getProductById } from "@/data/products/get-products";
 
 import { EventsSection } from "./_components/events-section";
 import { LeadsSection } from "./_components/leads-section";
+import { OrdersSection } from "./_components/orders-section";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 
@@ -40,9 +42,10 @@ export default async function ProductDetailPage({
     notFound();
   }
 
-  const [leads, events] = await Promise.all([
+  const [leads, events, orders] = await Promise.all([
     getLeadsByProductId(id),
     getEventsByProductId(id),
+    getOrdersByProductId(id),
   ]);
 
   return (
@@ -51,12 +54,13 @@ export default async function ProductDetailPage({
         <div>
           <PageTitle>{product.name}</PageTitle>
           <PageDescription>
-            Visualize leads e eventos relacionados a este produto.
+            Visualize leads, pedidos e eventos relacionados a este produto.
           </PageDescription>
         </div>
       </PageHeader>
       <PageContent>
         <LeadsSection leads={leads} />
+        <OrdersSection orders={orders} />
         <EventsSection events={events} />
       </PageContent>
     </PageContainer>

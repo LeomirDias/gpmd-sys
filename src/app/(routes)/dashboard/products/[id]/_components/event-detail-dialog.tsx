@@ -25,6 +25,7 @@ interface EventDetailDialogProps {
     created_at: Date;
     updated_at: Date;
     product_id: string | null;
+    lead_id: string | null;
   };
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -39,6 +40,8 @@ export const EventDetailDialog = ({
     switch (category) {
       case "sale":
         return "Venda";
+      case "lead_capture":
+        return "Captura de Lead";
       case "remarketing":
         return "Remarketing";
       case "upsell":
@@ -51,11 +54,9 @@ export const EventDetailDialog = ({
   const getTypeLabel = (type: string) => {
     switch (type) {
       case "email_delivery":
-        return "Entrega de Email";
-      case "email_opened":
-        return "Email Aberto";
-      case "email_clicked":
-        return "Email Clicado";
+        return "Entrega via Email";
+      case "whatsapp_delivery":
+        return "Entrega via WhatsApp";
       default:
         return type;
     }
@@ -78,31 +79,21 @@ export const EventDetailDialog = ({
             </div>
             <div>
               <p className="text-muted-foreground text-sm font-medium">
-                Categoria
-              </p>
-              <p className="mt-1">{getCategoryLabel(event.category)}</p>
-            </div>
-            <div>
-              <p className="text-muted-foreground text-sm font-medium">
                 Destinatário
               </p>
               <p className="mt-1">{event.to}</p>
             </div>
             <div>
               <p className="text-muted-foreground text-sm font-medium">
-                Assunto
+                Categoria
               </p>
-              <p className="mt-1">{event.subject}</p>
+              <p className="mt-1">{getCategoryLabel(event.category)}</p>
             </div>
             <div>
               <p className="text-muted-foreground text-sm font-medium">
-                Data de Envio
+                Assunto
               </p>
-              <p className="mt-1">
-                {event.sent_at
-                  ? dayjs(event.sent_at).format("DD/MM/YYYY [às] HH:mm")
-                  : "-"}
-              </p>
+              <p className="mt-1">{event.subject}</p>
             </div>
             <div>
               <p className="text-muted-foreground text-sm font-medium">
@@ -114,12 +105,22 @@ export const EventDetailDialog = ({
             </div>
             <div>
               <p className="text-muted-foreground text-sm font-medium">
-                Última Atualização
+                Data de Envio
               </p>
               <p className="mt-1">
-                {dayjs(event.updated_at).format("DD/MM/YYYY [às] HH:mm")}
+                {event.sent_at
+                  ? dayjs(event.sent_at).format("DD/MM/YYYY [às] HH:mm")
+                  : "-"}
               </p>
             </div>
+            {event.lead_id && (
+              <div>
+                <p className="text-muted-foreground text-sm font-medium">
+                  ID do Lead
+                </p>
+                <p className="mt-1 font-mono text-sm">{event.lead_id}</p>
+              </div>
+            )}
           </div>
         </div>
       </DialogContent>

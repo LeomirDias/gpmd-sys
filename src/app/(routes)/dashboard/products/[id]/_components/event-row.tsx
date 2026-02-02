@@ -22,6 +22,7 @@ interface EventRowProps {
     created_at: Date;
     updated_at: Date;
     product_id: string | null;
+    lead_id: string | null;
   };
 }
 
@@ -32,6 +33,8 @@ export const EventRow = ({ event }: EventRowProps) => {
     switch (category) {
       case "sale":
         return "Venda";
+      case "lead_capture":
+        return "Captura de Lead";
       case "remarketing":
         return "Remarketing";
       case "upsell":
@@ -44,11 +47,9 @@ export const EventRow = ({ event }: EventRowProps) => {
   const getTypeLabel = (type: string) => {
     switch (type) {
       case "email_delivery":
-        return "Entrega de Email";
-      case "email_opened":
-        return "Email Aberto";
-      case "email_clicked":
-        return "Email Clicado";
+        return "Entrega via Email";
+      case "whatsapp_delivery":
+        return "Entrega via WhatsApp";
       default:
         return type;
     }
@@ -61,6 +62,17 @@ export const EventRow = ({ event }: EventRowProps) => {
         <TableCell>{getCategoryLabel(event.category)}</TableCell>
         <TableCell>{event.to}</TableCell>
         <TableCell className="max-w-xs truncate">{event.subject}</TableCell>
+        <TableCell>
+          {event.created_at
+            ? new Date(event.created_at).toLocaleDateString("pt-BR", {
+              day: "2-digit",
+              month: "2-digit",
+              year: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+            })
+            : "-"}
+        </TableCell>
         <TableCell>
           {event.sent_at
             ? new Date(event.sent_at).toLocaleDateString("pt-BR", {

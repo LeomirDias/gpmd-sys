@@ -21,12 +21,6 @@ export const auth = betterAuth({
       verifications: schema.verificationsTable,
     },
   }),
-  socialProviders: {
-    google: {
-      clientId: process.env.GOOGLE_CLIENT_ID as string,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
-    },
-  },
   plugins: [
     customSession(async ({ user, session }) => {
       return {
@@ -57,7 +51,7 @@ export const auth = betterAuth({
       resend.emails.send({
         from: `${process.env.NAME_FOR_ACCOUNT_MANAGEMENT_SUBMISSIONE} <${process.env.EMAIL_FOR_ACCOUNT_MANAGEMENT_SUBMISSION}>`,
         to: user.email,
-        subject: "Redefina sua senha - iGenda App",
+        subject: "Redefina sua senha",
         react: ForgotPasswordEmail({
           username: user.name,
           resetUrl: url,

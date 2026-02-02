@@ -354,6 +354,7 @@ Equipe CarsLab 💛
                     subject: `Produto ${product.name} entregue via WhatsApp`,
                     product_id: product.id,
                     sent_at: new Date(),
+                    lead_id: newLead.id,
                   });
                 },
               });

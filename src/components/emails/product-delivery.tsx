@@ -2,7 +2,6 @@ import {
   Body,
   Container,
   Head,
-  Heading,
   Html,
   Img,
   Preview,
@@ -15,10 +14,13 @@ import * as React from "react";
 interface ProductDeliveryEmailProps {
   customerName: string;
   productName: string;
+  /** URL pública da logo. Preferir sobre cid: para compatibilidade (Gmail, Resend). */
+  logoUrl?: string | null;
 }
 
 const ProductDeliveryEmail = (props: ProductDeliveryEmailProps) => {
-  const { customerName, productName } = props;
+  const { customerName, productName, logoUrl } = props;
+  const logoSrc = logoUrl ?? "cid:carslab-logo";
 
   return (
     <Html lang="pt-BR">
@@ -49,38 +51,31 @@ const ProductDeliveryEmail = (props: ProductDeliveryEmailProps) => {
             {/* Header */}
             <Section
               style={{
-                background:
-                  "linear-gradient(135deg, #22c55e 0%, #16a34a 100%)",
+                backgroundColor: "#16a34a",
                 borderRadius: "8px 8px 0 0",
-                padding: "40px 0 20px 0",
+                padding: "32px 24px 24px",
                 textAlign: "center",
               }}
             >
-              <Heading
-                style={{
-                  margin: 0,
-                  color: "#ffffff",
-                  fontSize: "32px",
-                  fontWeight: "bold",
-                  marginBottom: "20px",
-                }}
-              >
+              <Section style={{ textAlign: "center", marginBottom: "16px" }}>
                 <Img
-                  src={`cid:carslab-logo`}
+                  src={logoSrc}
                   alt="CarsLab"
-                  width={56}
+                  width={120}
                   height={48}
                   style={{
-                    display: "block",
+                    display: "inline-block",
                     margin: "0 auto",
+                    maxWidth: "120px",
+                    height: "auto",
                   }}
                 />
-              </Heading>
+              </Section>
               <Text
                 style={{
-                  margin: "6px 0 0 0",
+                  margin: "0",
                   color: "#ffffff",
-                  fontSize: "32px",
+                  fontSize: "28px",
                   fontWeight: "bold",
                   lineHeight: "1.2",
                 }}
@@ -89,10 +84,9 @@ const ProductDeliveryEmail = (props: ProductDeliveryEmailProps) => {
               </Text>
               <Text
                 style={{
-                  margin: "6px 0 0 0",
-                  color: "#ffffff",
+                  margin: "8px 0 0 0",
+                  color: "#e8f5e9",
                   fontSize: "16px",
-                  opacity: 0.9,
                 }}
               >
                 Agradecemos por escolher nosso conteúdo! 💛
@@ -100,77 +94,82 @@ const ProductDeliveryEmail = (props: ProductDeliveryEmailProps) => {
             </Section>
 
             {/* Content */}
-            <Section style={{ padding: "40px 60px" }}>
+            <Section
+              style={{
+                padding: "32px 24px",
+                width: "100%",
+                maxWidth: "600px",
+              }}
+            >
               {/* Welcome message */}
-              <div style={{ textAlign: "center", marginBottom: "30px" }}>
-                <Heading
+              <Section style={{ textAlign: "center", marginBottom: "24px" }}>
+                <Text
                   style={{
-                    margin: "0 0 10px 0",
+                    margin: "0",
                     color: "#ffde59",
                     fontSize: "24px",
                     fontWeight: "bold",
                   }}
                 >
                   Olá, {customerName}!
-                </Heading>
-              </div>
+                </Text>
+              </Section>
 
               {/* Main message */}
-              <div
+              <Section
                 style={{
                   backgroundColor: "#333333",
-                  padding: "30px",
+                  padding: "24px",
                   borderRadius: "8px",
-                  borderLeft: "4px solid #ffde59",
-                  marginBottom: "30px",
+                  border: "4px solid #ffde59",
+                  marginBottom: "24px",
+                  width: "100%",
                 }}
               >
                 <Text
                   style={{
-                    margin: "0 0 20px 0",
-                    color: "#374151",
+                    margin: "0 0 16px 0",
+                    color: "#e5e7eb",
                     fontSize: "16px",
-                    lineHeight: 1.6,
+                    lineHeight: "1.6",
                   }}
                 >
                   Agradecemos por escolher nosso produto! 💛
                 </Text>
                 <Text
                   style={{
-                    margin: "0 0 20px 0",
-                    color: "#374151",
+                    margin: "0 0 16px 0",
+                    color: "#e5e7eb",
                     fontSize: "16px",
-                    lineHeight: 1.6,
+                    lineHeight: "1.6",
                   }}
                 >
-                  Sua compra do produto <strong style={{ color: "#ffde59" }}>{productName}</strong> foi
-                  confirmada com sucesso!
+                  Sua compra do produto <strong style={{ color: "#ffde59" }}>{productName}</strong> foi confirmada com sucesso!
                 </Text>
                 <Text
                   style={{
-                    margin: 0,
-                    color: "#374151",
+                    margin: "0",
+                    color: "#e5e7eb",
                     fontSize: "16px",
-                    lineHeight: 1.6,
+                    lineHeight: "1.6",
                   }}
                 >
-                  O arquivo do seu produto está anexado neste email e pronto
-                  para download. Aproveite!
+                  O arquivo do seu produto está anexado neste email e pronto para download. Aproveite!
                 </Text>
-              </div>
+              </Section>
 
               {/* Additional info */}
-              <div
+              <Section
                 style={{
                   backgroundColor: "#333333",
                   padding: "20px",
                   borderRadius: "8px",
-                  border: "1px solid #dbeafe",
+                  border: "1px solid #6b7280",
                 }}
               >
                 <Text
                   style={{
-                    margin: "0 0 10px 0",
+                    margin: "0 0 8px 0",
                     color: "#ffde59",
                     fontSize: "14px",
                     fontWeight: "bold",
@@ -180,38 +179,37 @@ const ProductDeliveryEmail = (props: ProductDeliveryEmailProps) => {
                 </Text>
                 <Text
                   style={{
-                    margin: 0,
-                    color: "#ffffff",
+                    margin: "0",
+                    color: "#e5e7eb",
                     fontSize: "14px",
-                    lineHeight: 1.5,
+                    lineHeight: "1.5",
                   }}
                 >
-                  Salve o arquivo em um local seguro para acessá-lo sempre que
-                  precisar. Caso tenha alguma dúvida, entre em contato conosco!
+                  Salve o arquivo em um local seguro para acessá-lo sempre que precisar. Caso tenha alguma dúvida, entre em contato conosco!
                 </Text>
-              </div>
+              </Section>
             </Section>
 
             {/* Footer */}
             <Section
               style={{
-                padding: "30px 60px",
+                padding: "24px",
                 backgroundColor: "#272727",
                 borderRadius: "0 0 8px 8px",
-                borderTop: "1px solid #e5e7eb",
+                borderTop: "1px solid #4b5563",
                 textAlign: "center",
               }}
             >
               <Text
                 style={{
-                  margin: "0 0 10px 0",
-                  color: "#333333",
+                  margin: "0 0 8px 0",
+                  color: "#9ca3af",
                   fontSize: "14px",
                 }}
               >
                 Precisa de ajuda? Entre em contato conosco:
               </Text>
-              <Text style={{ margin: "0 0 10px 0" }}>
+              <Text style={{ margin: "0 0 16px 0" }}>
                 <a
                   href="https://wa.me/64996775544"
                   style={{
@@ -226,39 +224,36 @@ const ProductDeliveryEmail = (props: ProductDeliveryEmailProps) => {
 
               <Text
                 style={{
-                  margin: "6px 0 0 0",
-                  color: "#333333",
+                  margin: "0 0 8px 0",
+                  color: "#9ca3af",
                   fontSize: "12px",
-                  lineHeight: 1.4,
+                  lineHeight: "1.4",
                 }}
               >
-                <br />
                 Este email foi enviado automaticamente pois você comprou um de nossos produtos.
               </Text>
 
               <Text
                 style={{
-                  margin: "6px 0 0 0",
-                  color: "#333333",
+                  margin: "0 0 8px 0",
+                  color: "#9ca3af",
                   fontSize: "12px",
-                  lineHeight: 1.4,
+                  lineHeight: "1.4",
                 }}
               >
-                <br />
                 Se você não reconhece este email, por favor, entre em contato conosco.
               </Text>
 
               <Text
                 style={{
-                  margin: "6px 0 0 0",
-                  color: "#333333",
+                  margin: "0",
+                  color: "#9ca3af",
                   fontSize: "12px",
-                  lineHeight: 1.4,
+                  lineHeight: "1.4",
                 }}
               >
-                <br />
                 Equipe CarsLab 💛
-                <br />
+                {" "}
                 © 2025 CarsLab. Todos os direitos reservados.
               </Text>
             </Section>

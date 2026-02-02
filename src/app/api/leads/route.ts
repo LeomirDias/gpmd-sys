@@ -11,7 +11,7 @@ import { getProductsByIds } from "@/data/products/get-products";
 import { db } from "@/db";
 import { events, leads, ordersTable } from "@/db/schema";
 import { fetchBlobWithRetry } from "@/lib/fetch-blob-with-retry";
-import { getEmailLogoAttachment } from "@/lib/email-logo";
+import { getEmailLogoAttachment, getEmailLogoUrl } from "@/lib/email-logo";
 import { sendWhatsappDocument } from "@/lib/zapi-service";
 
 const LEAD_API_TOKEN = process.env.LEAD_API_TOKEN;
@@ -290,6 +290,7 @@ export async function POST(req: NextRequest) {
                       dbProducts.length === 1
                         ? dbProducts[0]!.name
                         : productNames,
+                    logoUrl: getEmailLogoUrl() ?? undefined,
                   }),
                   attachments,
                 });

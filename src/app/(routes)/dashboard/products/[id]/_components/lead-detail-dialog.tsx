@@ -3,6 +3,7 @@
 import "dayjs/locale/pt-br";
 
 import dayjs from "dayjs";
+import { useEffect, useState } from "react";
 
 import {
   Dialog,
@@ -11,6 +12,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { getProductNameById } from "@/actions/product/get-product-name";
 
 dayjs.locale("pt-br");
 
@@ -38,6 +40,20 @@ export const LeadDetailDialog = ({
   open,
   onOpenChange,
 }: LeadDetailDialogProps) => {
+  const [productName, setProductName] = useState<string | null>(null);
+  const [productLoading, setProductLoading] = useState(false);
+
+  useEffect(() => {
+    if (!open || !lead.product_id) {
+      setProductName(null);
+      return;
+    }
+    setProductLoading(true);
+    getProductNameById(lead.product_id)
+      .then((p) => setProductName(p?.name ?? null))
+      .finally(() => setProductLoading(false));
+  }, [open, lead.product_id]);
+
   const getConversionStatusLabel = (status: string) => {
     switch (status) {
       case "converted":
@@ -66,6 +82,8 @@ export const LeadDetailDialog = ({
         return "Email";
       case "phone":
         return "Telefone";
+      case "both":
+        return "Email e Telefone";
       default:
         return type;
     }
@@ -73,10 +91,10 @@ export const LeadDetailDialog = ({
 
   const getUserTypeLabel = (type: string) => {
     switch (type) {
-      case "lead":
-        return "Lead";
-      case "customer":
-        return "Cliente";
+      case "hobby":
+        return "Hobby";
+      case "empreendedor":
+        return "Empreendedor";
       default:
         return type;
     }
@@ -88,7 +106,7 @@ export const LeadDetailDialog = ({
         <DialogHeader>
           <DialogTitle>Detalhes do Lead</DialogTitle>
           <DialogDescription>
-            Informações completas do lead {lead.name}
+            Informações completas do lead
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
@@ -135,7 +153,7 @@ export const LeadDetailDialog = ({
             </div>
             <div>
               <p className="text-muted-foreground text-sm font-medium">
-                Status Remarketing
+                Remarketing
               </p>
               <p className="mt-1">
                 {getRemarketingStatusLabel(lead.remarketing_status)}
@@ -157,7 +175,19 @@ export const LeadDetailDialog = ({
             </div>
             <div>
               <p className="text-muted-foreground text-sm font-medium">
-                Data de Criação
+                Produto
+              </p>
+              <p className="mt-1">
+                {!lead.product_id
+                  ? "Não associado a nenhum produto"
+                  : productLoading
+                    ? "Carregando..."
+                    : productName ?? lead.product_id}
+              </p>
+            </div>
+            <div>
+              <p className="text-muted-foreground text-sm font-medium">
+                Data de registro
               </p>
               <p className="mt-1">
                 {dayjs(lead.created_at).format("DD/MM/YYYY [às] HH:mm")}

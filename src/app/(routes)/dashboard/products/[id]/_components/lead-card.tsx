@@ -63,7 +63,7 @@ export const LeadCard = ({ lead }: LeadCardProps) => {
         <CardHeader>
           <CardTitle>{lead.name}</CardTitle>
           <CardDescription>
-            {lead.contact_type === "email" ? "Email" : "Telefone"}
+            {lead.user_type === "hobby" ? "Hobby" : "Empreendedor"}
           </CardDescription>
         </CardHeader>
         <CardContent>

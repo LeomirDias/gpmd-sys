@@ -29,7 +29,10 @@ export const OrdersSection = ({ orders }: OrdersSectionProps) => {
 
   return (
     <div>
-      <h2 className="mb-4 text-xl font-semibold">Pedidos ({orders.length})</h2>
+      <div className="mb-4 flex flex-col items-start justify-center gap-2">
+        <h2 className="text-xl font-semibold">Pedidos</h2>
+        <p className="text-sm text-muted-foreground"> Total de pedidos: {orders.length}</p>
+      </div>
       <div className="rounded-md border">
         <Table>
           <TableHeader>

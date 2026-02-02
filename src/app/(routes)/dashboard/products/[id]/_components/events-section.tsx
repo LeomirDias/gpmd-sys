@@ -39,7 +39,10 @@ export const EventsSection = ({ events }: EventsSectionProps) => {
 
   return (
     <div>
-      <h2 className="mb-4 text-xl font-semibold">Eventos ({events.length})</h2>
+      <div className="mb-4 flex flex-col items-start justify-center gap-2">
+        <h2 className="text-xl font-semibold">Eventos</h2>
+        <p className="text-sm text-muted-foreground"> Total de eventos: {events.length}</p>
+      </div>
       <div className="rounded-md border">
         <Table>
           <TableHeader>

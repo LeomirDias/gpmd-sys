@@ -33,8 +33,11 @@ export const LeadsSection = ({ leads }: LeadsSectionProps) => {
 
   return (
     <div>
-      <h2 className="mb-4 text-xl font-semibold">Leads ({leads.length})</h2>
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div className="mb-4 flex flex-col items-start justify-center gap-2">
+        <h2 className="text-xl font-semibold">Leads</h2>
+        <p className="text-sm text-muted-foreground"> Total de leads: {leads.length}</p>
+      </div>
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-7">
         {leads.map((lead) => (
           <LeadCard key={lead.id} lead={lead} />
         ))}

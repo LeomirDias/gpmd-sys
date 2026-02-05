@@ -12,7 +12,6 @@ import {
 import { db } from "@/db";
 import { events, leads, ordersTable } from "@/db/schema";
 import { fetchBlobWithRetry } from "@/lib/fetch-blob-with-retry";
-import { getEmailLogoAttachment, getEmailLogoUrl } from "@/lib/email-logo";
 import { sendWhatsappDocument } from "@/lib/zapi-service";
 
 const CAKTO_WEBHOOK_SECRET = process.env.CAKTO_WEBHOOK_SECRET || "";
@@ -260,7 +259,6 @@ export async function POST(req: NextRequest) {
               channel: "email",
               fn: async () => {
                 const attachments = [
-                  getEmailLogoAttachment(),
                   ...productBuffers.map(({ product, buffer }) => {
                     const rawFileName =
                       product.provider_path.split("/").pop() ||
@@ -292,7 +290,6 @@ export async function POST(req: NextRequest) {
                       dbProducts.length === 1
                         ? dbProducts[0]!.name
                         : productNames,
-                    logoUrl: getEmailLogoUrl() ?? undefined,
                   }),
                   attachments,
                 });

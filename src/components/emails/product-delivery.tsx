@@ -57,20 +57,6 @@ const ProductDeliveryEmail = (props: ProductDeliveryEmailProps) => {
                 textAlign: "center",
               }}
             >
-              <Section style={{ textAlign: "center", marginBottom: "16px" }}>
-                <Img
-                  src={logoSrc}
-                  alt="CarsLab"
-                  width={120}
-                  height={48}
-                  style={{
-                    display: "inline-block",
-                    margin: "0 auto",
-                    maxWidth: "120px",
-                    height: "auto",
-                  }}
-                />
-              </Section>
               <Text
                 style={{
                   margin: "0",

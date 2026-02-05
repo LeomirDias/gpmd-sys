@@ -60,7 +60,7 @@ const ProductDeliveryEmail = (props: ProductDeliveryEmailProps) => {
               <Text
                 style={{
                   margin: "0",
-                  color: "#ffffff",
+                  color: "#ffde59",
                   fontSize: "28px",
                   fontWeight: "bold",
                   lineHeight: "1.2",
@@ -197,7 +197,7 @@ const ProductDeliveryEmail = (props: ProductDeliveryEmailProps) => {
               </Text>
               <Text style={{ margin: "0 0 16px 0" }}>
                 <a
-                  href="https://wa.me/64996775544"
+                  href="https://wa.me/5564992834346"
                   style={{
                     color: "#ffde59",
                     textDecoration: "none",

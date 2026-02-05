@@ -352,7 +352,7 @@ Até mais! 👋
 
 Equipe CarsLab 💛
 
-📱Fale conosco via WhatsApp: +55 64 9 9999-9999 
+📱Fale conosco via WhatsApp: +55 64 9 9283-4346 
 
 📧 Fale conosco via Email: suportecarslab@gmail.com
                 `,
